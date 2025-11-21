@@ -18,6 +18,8 @@ services:
       driver: journald
       options:
         tag: mailu-front
+    expose:
+      - "80"
     ports:
       - '127.0.0.1:25:25'
       - '127.0.0.1:465:465'
@@ -29,7 +31,6 @@ services:
       - '127.0.0.1:4190:4190'
     networks:
       - default
-      - webmail
     volumes:
       - '/mailu/certs:/certs'
       - '/mailu/overrides/nginx:/overrides:ro'
