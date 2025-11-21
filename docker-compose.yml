@@ -28,8 +28,8 @@ services:
       - '127.0.0.1:993:993'
       - '127.0.0.1:4190:4190'
     networks:
-      - mailu_default
-      - webmail_default
+      - default
+      - webmail
     volumes:
       - '/mailu/certs:/certs'
       - '/mailu/overrides/nginx:/overrides:ro'
@@ -52,7 +52,7 @@ services:
         tag: mailu-resolver
     restart: always
     networks:
-      mailu_default:
+      default:
         ipv4_address: 192.168.203.254
   admin:
     image: '${DOCKER_ORG:-ghcr.io/mailu}/${DOCKER_PREFIX:-}admin:${MAILU_VERSION:-2024.06}'
@@ -88,7 +88,7 @@ services:
       - '/mailu/mail:/mail'
       - '/mailu/overrides/dovecot:/overrides:ro'
     networks:
-      - mailu_default
+      - default
     depends_on:
       - front
       - resolver
@@ -119,7 +119,7 @@ services:
         tag: mailu-oletools
     restart: always
     networks:
-      - oletools_default
+      - oletools
     depends_on:
       - resolver
     dns:
@@ -134,8 +134,8 @@ services:
       options:
         tag: mailu-antispam
     networks:
-      - mailu_default
-      - oletools_default
+      - default
+      - oletools
     volumes:
       - '/mailu/filter:/var/lib/rspamd'
       - '/mailu/overrides/rspamd:/overrides:ro'
@@ -158,7 +158,7 @@ services:
       - '/mailu/webmail:/data'
       - '/mailu/overrides/roundcube:/overrides:ro'
     networks:
-      - webmail_default
+      - webmail
     depends_on:
       - front
     labels:
@@ -168,18 +168,15 @@ services:
       - traefik.http.routers.mailu-webmail.tls=true
       - traefik.http.services.mailu-webmail.loadbalancer.server.port=80
 networks:
-  mailu_default:
-    name: mailu_default
+  default:
     driver: bridge
     ipam:
       driver: default
       config:
         -
           subnet: 192.168.203.0/24
-  webmail_default:
-    name: webmail_default
+  webmail:
     driver: bridge
-  oletools_default:
-    name: oletools_default
+  oletools:
     driver: bridge
     internal: true
